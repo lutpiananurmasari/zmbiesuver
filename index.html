@@ -2,20 +2,32 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Zombie Survival</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Down Shooter</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>🧟 Zombie Survival</h1>
-
-<div id="info">
-    <span>Level: <span id="level">1</span></span>
-    <span>Waktu: <span id="timer">60</span></span>
-    <span>Skor: <span id="score">0</span></span>
+<div id="hud">
+    <div>⏰ Waktu: <span id="time">60</span></div>
+    <div>⭐ Level: <span id="level">1</span></div>
+    <div>🏆 Skor: <span id="score">0</span></div>
 </div>
 
-<canvas id="game" width="800" height="500"></canvas>
+<div id="game">
+    <div id="player1" class="player"></div>
+    <div id="player2" class="player"></div>
+</div>
+
+<div id="gameOver" class="hidden">
+    <h1>GAME OVER</h1>
+    <button onclick="location.reload()">Main Lagi</button>
+</div>
+
+<audio id="shootSound" src="assets/shoot.wav"></audio>
+<audio id="hitSound" src="assets/hit.wav"></audio>
+<audio id="levelSound" src="assets/levelup.wav"></audio>
+<audio id="gameOverSound" src="assets/gameover.wav"></audio>
 
 <script src="script.js"></script>
 
