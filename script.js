@@ -1,24 +1,208 @@
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const player1 = document.getElementById("player1");
+const player2 = document.getElementById("player2");
+const game = document.getElementById("game");
 
-let player = {
-    x:100,
-    y:100,
-    size:30,
-    speed:5
-};
+const scoreText = document.getElementById("score");
+const levelText = document.getElementById("level");
+const timeText = document.getElementById("time");
+const gameOver = document.getElementById("gameOver");
 
-function drawPlayer(){
-    ctx.fillStyle="blue";
-    ctx.fillRect(player.x,player.y,player.size,player.size);
+const shootSound = document.getElementById("shootSound");
+const hitSound = document.getElementById("hitSound");
+const levelSound = document.getElementById("levelSound");
+const gameOverSound = document.getElementById("gameOverSound");
+
+let score = 0;
+let level = 1;
+let time = 60;
+
+let p1 = { x: 100, y: 300 };
+let p2 = { x: 180, y: 300 };
+
+const speed = 5;
+const keys = {};
+
+document.addEventListener("keydown", (e) => {
+    keys[e.key] = true;
+
+    // Spasi = Player 1 menembak
+    if (e.key === " ") shoot(p1);
+
+    // Enter = Player 2 menembak
+    if (e.key === "Enter") shoot(p2);
+});
+
+document.addEventListener("keyup", (e) => {
+    keys[e.key] = false;
+});
+
+function updatePlayer() {
+
+    // Player 1 (WASD)
+    if (keys["w"]) p1.y -= speed;
+    if (keys["s"]) p1.y += speed;
+    if (keys["a"]) p1.x -= speed;
+    if (keys["d"]) p1.x += speed;
+
+    // Player 2 (Arrow)
+    if (keys["ArrowUp"]) p2.y -= speed;
+    if (keys["ArrowDown"]) p2.y += speed;
+    if (keys["ArrowLeft"]) p2.x -= speed;
+    if (keys["ArrowRight"]) p2.x += speed;
+
+    p1.x = Math.max(0, Math.min(window.innerWidth - 50, p1.x));
+    p1.y = Math.max(0, Math.min(window.innerHeight - 50, p1.y));
+
+    p2.x = Math.max(0, Math.min(window.innerWidth - 50, p2.x));
+    p2.y = Math.max(0, Math.min(window.innerHeight - 50, p2.y));
+
+    player1.style.left = p1.x + "px";
+    player1.style.top = p1.y + "px";
+
+    player2.style.left = p2.x + "px";
+    player2.style.top = p2.y + "px";
 }
 
-function game(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+function shoot(player){
 
-    drawPlayer();
+    shootSound.currentTime = 0;
+    shootSound.play();
 
-    requestAnimationFrame(game);
+    const bullet = document.createElement("div");
+    bullet.className = "bullet";
+
+    bullet.style.left = player.x + 20 + "px";
+    bullet.style.top = player.y + "px";
+
+    game.appendChild(bullet);
+
+    let bulletMove = setInterval(() => {
+
+        bullet.style.top = bullet.offsetTop - 10 + "px";
+
+        enemies.forEach((enemy,index)=>{
+
+            if(
+                bullet.offsetLeft < enemy.offsetLeft + 50 &&
+                bullet.offsetLeft + 10 > enemy.offsetLeft &&
+                bullet.offsetTop < enemy.offsetTop + 50 &&
+                bullet.offsetTop + 10 > enemy.offsetTop
+            ){
+
+                hitSound.currentTime=0;
+                hitSound.play();
+
+                enemy.remove();
+                bullet.remove();
+
+                enemies.splice(index,1);
+
+                score+=10;
+                scoreText.innerText=score;
+
+                if(score%100==0){
+                    level++;
+                    levelText.innerText=level;
+
+                    levelSound.currentTime=0;
+                    levelSound.play();
+
+                    spawnEnemy();
+                }
+
+                clearInterval(bulletMove);
+
+            }
+
+        });
+
+        if(bullet.offsetTop<0){
+            bullet.remove();
+            clearInterval(bulletMove);
+        }
+
+    },20);
+
 }
 
-game();
+let enemies=[];
+
+function spawnEnemy(){
+
+    const enemy=document.createElement("div");
+
+    enemy.className="enemy";
+
+    enemy.style.left=Math.random()*(window.innerWidth-50)+"px";
+    enemy.style.top="0px";
+
+    game.appendChild(enemy);
+
+    enemies.push(enemy);
+
+}
+
+for(let i=0;i<5;i++){
+    spawnEnemy();
+}
+
+function moveEnemy(){
+
+    enemies.forEach(enemy=>{
+
+        let target = Math.random()>0.5 ? p1 : p2;
+
+        let ex=enemy.offsetLeft;
+        let ey=enemy.offsetTop;
+
+        if(ex<target.x) ex+=2+level;
+        if(ex>target.x) ex-=2+level;
+
+        if(ey<target.y) ey+=2+level;
+        if(ey>target.y) ey-=2+level;
+
+        enemy.style.left=ex+"px";
+        enemy.style.top=ey+"px";
+
+        if(
+            ex<target.x+40 &&
+            ex+40>target.x &&
+            ey<target.y+40 &&
+            ey+40>target.y
+        ){
+
+            finishGame();
+
+        }
+
+    });
+
+}
+
+function finishGame(){
+
+    gameOver.classList.remove("hidden");
+
+    gameOverSound.play();
+
+    clearInterval(gameLoop);
+    clearInterval(enemyLoop);
+    clearInterval(timerLoop);
+
+}
+
+const timerLoop=setInterval(()=>{
+
+    time--;
+
+    timeText.innerText=time;
+
+    if(time<=0){
+        finishGame();
+    }
+
+},1000);
+
+const gameLoop=setInterval(updatePlayer,20);
+
+const enemyLoop=setInterval(moveEnemy,30);
