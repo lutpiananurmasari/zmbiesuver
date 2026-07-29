@@ -1,73 +1,21 @@
-const player = document.getElementById("player");
-const coin = document.getElementById("coin");
-
-const scoreText = document.getElementById("score");
-const levelText = document.getElementById("level");
-const timeText = document.getElementById("time");
-
-let playerX = 170;
-let coinX = Math.random() * 360;
-let coinY = 0;
-
-let score = 0;
-let level = 1;
-let time = 60;
-let speed = 3;
-
-// Gerakkan pemain
-document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft" && playerX > 0) {
-        playerX -= 20;
-    }
-
-    if (e.key === "ArrowRight" && playerX < 340) {
-        playerX += 20;
-    }
-
-    player.style.left = playerX + "px";
-});
-
-// Koin jatuh
-function updateGame() {
-    coinY += speed;
-
-    if (coinY > 370) {
-        coinY = 0;
-        coinX = Math.random() * 360;
-    }
-
-    // Tangkap koin
-    if (
-        coinY > 340 &&
-        coinX > playerX - 30 &&
-        coinX < playerX + 50
-    ) {
-        score++;
-        scoreText.textContent = score;
-
-        coinY = 0;
-        coinX = Math.random() * 360;
-
-        if (score % 5 === 0) {
-            level++;
-            levelText.textContent = level;
-            speed++;
-        }
-    }
-
-    coin.style.left = coinX + "px";
-    coin.style.top = coinY + "px";
+body{
+    margin:0;
+    background:#222;
+    color:white;
+    text-align:center;
+    font-family:Arial;
 }
 
-setInterval(updateGame, 20);
+#game{
+    border:3px solid white;
+    background:url("images/background.jpg");
+    background-size:cover;
+}
 
-// Timer
-setInterval(() => {
-    if (time > 0) {
-        time--;
-        timeText.textContent = time;
-    } else {
-        alert("Game Over!\nSkor: " + score);
-        location.reload();
-    }
-}, 1000);
+#info{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    font-size:22px;
+    margin-bottom:15px;
+}
