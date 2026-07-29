@@ -1,0 +1,21 @@
+body{
+    margin:0;
+    background:#222;
+    color:white;
+    text-align:center;
+    font-family:Arial;
+}
+
+#game{
+    border:3px solid white;
+    background:url("images/background.jpg");
+    background-size:cover;
+}
+
+#info{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    font-size:22px;
+    margin-bottom:15px;
+}
